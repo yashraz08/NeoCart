@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card shadow p-4 mx-auto" style="max-width:600px;">
+  <h3 class="text-center mb-3">Create Account</h3>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="row">
+      <div class="col-md-6 mb-2">
+        <label>First Name</label>
+        <input type="text" name="first_name" class="form-control" required>
+      </div>
+
+      <div class="col-md-6 mb-2">
+        <label>Last Name</label>
+        <input type="text" name="last_name" class="form-control" required>
+      </div>
+    </div>
+
+    <div class="mb-2">
+      <label>Email (This is your Username)</label>
+      <input type="email" name="email" class="form-control" required>
+    </div>
+
+    <div class="mb-2">
+      <label>Password</label>
+      <input type="password" name="password" class="form-control" required>
+    </div>
+
+  
+
+
+
+    <div class="mb-2">
+      <label>Mobile Number</label>
+      <input type="text" name="mobile" class="form-control"
+             placeholder="10-digit mobile number"
+             pattern="[0-9]{10}" required>
+    </div>
+  <hr>
+    <h6 class="fw-bold">Delivery Address</h6>   
+
+    <div class="mb-3">
+      <label>Full Address</label>
+      <textarea name="address" class="form-control" rows="3"
+                placeholder="House No, Street, Area, City, State"
+                required></textarea>
+    </div>
+
+
+  <div class="mb-2">
+      <label>Pincode</label>
+      <input type="text" name="pincode" class="form-control"
+             placeholder="Enter pincode"
+             pattern="[0-9]{6}" required>
+    </div>   <button class="btn btn-primary w-100">
+      Register
+    </button>  </form>
+
+  <hr>
+  <p class="text-center">
+    Already have an account?
+    <a href="{% url 'login' %}" class="fw-bold">Login here</a>
+  </p>
+</div>
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card shadow p-4 mx-auto" style="max-width:500px;">
+  <h3 class="mb-3 text-center">Payment Gateway</h3>
+
+  <p><strong>Total Amount:</strong> ₹{{ total }}</p>
+  <p class="text-muted">This is a dummy payment system for project demonstration.</p>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label>Card Number</label>
+      <input type="text" class="form-control" placeholder="4111 1111 1111 1111" disabled>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col">
+        <input type="text" class="form-control" placeholder="MM/YY" disabled>
+      </div>
+      <div class="col">
+        <input type="text" class="form-control" placeholder="CVV" disabled>
+      </div>
+    </div>
+
+    <button class="btn btn-success w-100">
+      Pay Now (Dummy)
+    </button>
+  </form>
+
+</div>
+
+{% endblock %}

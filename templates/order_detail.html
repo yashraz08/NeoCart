@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+
+    <h4 class="mb-1">Order #{{ order.id }}</h4>
+    <p class="text-muted">
+      Placed on {{ order.created_at|date:"d M Y, h:i A" }}
+    </p>
+
+    <span class="badge bg-success mb-3">
+      {{ order.status }}
+    </span>
+
+    <hr>
+
+    <h5>📦 Shipping Address</h5>
+    <p class="mb-0">
+      <strong>{{ order.user.first_name }} {{ order.user.last_name }}</strong><br>
+      {{ order.user.userprofile.address }}<br>
+      {{ order.user.userprofile.city }} - {{ order.user.userprofile.pincode }}<br>
+      📞 {{ order.user.userprofile.mobile }}
+    </p>
+
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+
+    <h5 class="mb-3">🛒 Items</h5>
+
+    <table class="table align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Product</th>
+          <th class="text-center">Qty</th>
+          <th>Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for item in order.items.all %}
+        <tr>
+          <td>{{ item.product.name }}</td>
+          <td class="text-center">{{ item.quantity }}</td>
+          <td>₹{{ item.price }}</td>
+          <td>₹{{ item.price|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h4 class="text-end mt-3">
+      Grand Total: ₹{{ order.total_amount }}
+    </h4>
+
+  </div>
+</div>
+
+<a href="{% url 'orders' %}" class="btn btn-secondary mt-4">
+  ← Back to Orders
+</a>
+
+{% endblock %}

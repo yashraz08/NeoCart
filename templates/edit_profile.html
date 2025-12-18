@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card shadow p-4 mx-auto" style="max-width:600px;">
+  <h3 class="mb-3">Edit Profile</h3>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="mb-2">
+      <label>Full Name</label>
+      <input type="text" name="full_name"
+             value="{{ profile.full_name }}"
+             class="form-control" required>
+    </div>
+
+    <div class="mb-2">
+      <label>Email</label>
+      <input type="email" name="email"
+             value="{{ profile.email }}"
+             class="form-control" required>
+    </div>
+
+    <div class="mb-2">
+      <label>Mobile</label>
+      <input type="text" name="mobile"
+             value="{{ profile.mobile }}"
+             class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label>Address</label>
+      <textarea name="address"
+                class="form-control"
+                rows="3" required>{{ profile.address }}</textarea>
+    </div>
+
+    <button class="btn btn-success w-100">
+      Save Changes
+    </button>
+  </form>
+</div>
+
+{% endblock %}

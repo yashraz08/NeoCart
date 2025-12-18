@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card shadow p-4 mx-auto" style="max-width:600px;">
+  <h3 class="mb-3">My Account</h3>
+
+  <p><strong>Full Name:</strong> {{ profile.full_name }}</p>
+  <p><strong>Username:</strong> {{ request.user.username }}</p>
+  <p><strong>Email:</strong> {{ profile.email }}</p>
+  <p><strong>Mobile:</strong> {{ profile.mobile }}</p>
+  <p><strong>Address:</strong> {{ profile.address }}</p>
+  <p><strong>Pincode:</strong> {{ profile.pincode }}</p>
+
+  <a href="{% url 'edit_profile' %}" class="btn btn-primary">
+    Edit Profile
+  </a>
+  <a href="{% url 'orders' %}" class="btn btn-outline-primary mt-3">
+  📦 View Order History
+</a>
+</div>
+
+{% endblock %}

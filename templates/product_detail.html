@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row">
+  <div class="col-md-5">
+    {% if product.image %}
+    <img src="{{ product.image.url }}" class="img-fluid border p-3">
+    {% endif %}
+  </div>
+
+  <div class="col-md-7">
+    <h3>{{ product.name }}</h3>
+    <h4 class="text-success">₹{{ product.price }}</h4>
+    <p>Stock: {{ product.stock }}</p>
+    <p>Category: {{ product.category.name }}</p>
+
+    <a href="{% url 'add_to_cart' product.id %}"
+       class="btn btn-warning btn-lg">
+      Add to Cart
+    </a>
+  </div>
+</div>
+
+{% endblock %}
