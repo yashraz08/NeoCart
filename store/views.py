@@ -23,7 +23,6 @@ def home(request):
     if category_id:
         products = products.filter(category_id=category_id)
 
-    # 🔥 Products already in cart
     cart_product_ids = []
     if request.user.is_authenticated:
         cart_product_ids = Cart.objects.filter(
@@ -33,7 +32,7 @@ def home(request):
     context = {
         'products': products,
         'categories': categories,
-        'cart_product_ids': cart_product_ids
+        'cart_product_ids': list(cart_product_ids),
     }
     return render(request, 'home.html', context)
 
