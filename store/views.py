@@ -3,12 +3,14 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
 
 from .models import (
     Product, Category,
     Cart, Order, OrderItem,
     UserProfile
 )
+
 # ---------------- HOME ----------------
 def home(request):
     products = Product.objects.all()
@@ -32,16 +34,13 @@ def home(request):
     context = {
         'products': products,
         'categories': categories,
-        'cart_product_ids': list(cart_product_ids),
+        'cart_product_ids': cart_product_ids
     }
+
     return render(request, 'home.html', context)
 
 
-
 # ---------------- AUTH ----------------
-from .forms import RegisterForm
-from .models import UserProfile
-
 def register(request):
     if request.method == "POST":
         first_name = request.POST['first_name']
@@ -52,7 +51,7 @@ def register(request):
         pincode = request.POST['pincode']
         address = request.POST['address']
 
-        username = email  # simple & unique
+        username = email
 
         user = User.objects.create_user(
             username=username,
@@ -91,13 +90,13 @@ def user_login(request):
 
 def user_logout(request):
     logout(request)
-    return redirect('/') 
+    return redirect('/')
 
 
 # ---------------- CART ----------------
 @login_required
 def add_to_cart(request, product_id):
-    product = Product.objects.get(id=product_id)
+    product = get_object_or_404(Product, id=product_id)
 
     cart_item, created = Cart.objects.get_or_create(
         user=request.user,
@@ -108,7 +107,9 @@ def add_to_cart(request, product_id):
         cart_item.quantity += 1
 
     cart_item.save()
-    return redirect('view_cart')
+
+    # 🔥 Stay on same page
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
 @login_required
@@ -124,13 +125,24 @@ def view_cart(request):
 
 @login_required
 def remove_cart(request, item_id):
-    Cart.objects.get(id=item_id).delete()
+    Cart.objects.filter(id=item_id, user=request.user).delete()
+    return redirect('view_cart')
+
+
+@login_required
+def update_cart_quantity(request, cart_id):
+    cart_item = get_object_or_404(Cart, id=cart_id, user=request.user)
+
+    if request.method == "POST":
+        qty = int(request.POST.get('quantity', 1))
+        if qty > 0 and qty <= cart_item.product.stock:
+            cart_item.quantity = qty
+            cart_item.save()
+
     return redirect('view_cart')
 
 
 # ---------------- ORDER / CHECKOUT ----------------
-from .models import Order, OrderItem
-
 @login_required
 def checkout(request):
     cart_items = Cart.objects.filter(user=request.user)
@@ -147,7 +159,6 @@ def checkout(request):
             status="Payment Successful"
         )
 
-        # 🔥 SAVE ORDER ITEMS (CRITICAL)
         for item in cart_items:
             OrderItem.objects.create(
                 order=order,
@@ -161,20 +172,20 @@ def checkout(request):
 
     return render(request, 'checkout.html', {'total': total})
 
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def order_history(request):
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'orders.html', {'orders': orders})
 
-def product_detail(request, product_id):
-    product = Product.objects.get(id=product_id)
-    return render(request, 'product_detail.html', {'product': product})
 
-from django.contrib.auth.decorators import login_required
-from .models import UserProfile
+@login_required
+def order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    return render(request, 'order_detail.html', {'order': order})
 
+
+# ---------------- ACCOUNT ----------------
 @login_required
 def my_account(request):
     profile = UserProfile.objects.get(user=request.user)
@@ -194,43 +205,3 @@ def edit_profile(request):
         return redirect('my_account')
 
     return render(request, 'edit_profile.html', {'profile': profile})
-
-@login_required
-def update_cart_quantity(request, cart_id):
-    cart_item = get_object_or_404(Cart, id=cart_id, user=request.user)
-
-    if request.method == "POST":
-        qty = int(request.POST.get('quantity', 1))
-
-        if qty > 0 and qty <= cart_item.product.stock:
-            cart_item.quantity = qty
-            cart_item.save()
-
-    return redirect('view_cart')
-
-@login_required
-def order_history(request):
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, 'orders.html', {'orders': orders})
-@login_required
-def order_detail(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
-    return render(request, 'order_detail.html', {'order': order})
-from django.http import HttpResponseRedirect
-
-@login_required
-def add_to_cart(request, product_id):
-    product = Product.objects.get(id=product_id)
-
-    cart_item, created = Cart.objects.get_or_create(
-        user=request.user,
-        product=product
-    )
-
-    if not created:
-        cart_item.quantity += 1
-
-    cart_item.save()
-
-    # 🔥 Redirect back to same page
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
